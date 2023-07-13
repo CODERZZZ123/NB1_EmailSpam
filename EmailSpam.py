@@ -47,22 +47,28 @@ def BEM(train_path, valid_path, test_path, output_valid_BEM, efficency_valid_BEM
     clf = SPAMCLassifier1()
     clf.Parameter_train1(Train_data, y_train)
     predictions = clf.predict1(Valid_data)
-    count = 0
-    count1 = 0 
+    count_FP = 0
+    count_TP = 0 
+    count_FN = 0
+    count_TN = 0
     for i in range(predictions.shape[0]):
-        if y_valid[i] == 1 and predictions[i] == 1:
-            count1 += 1
-        if predictions[i] == 1 and y_valid[i] == 0:
-            count += 1
+        if y_valid[i] == 1 and predictions[i] == 1 :
+            count_TP += 1
+        elif y_valid[i] == 0 and predictions[i] == 0:
+            count_TN += 1
+        elif predictions[i] == 1 and y_valid[i] == 0:
+            count_FP += 1
         elif predictions[i] == 0 and y_valid[i] == 1:
-            count += 1
-    print(
-        f"The Accuracy of MEM model for SPam classifier is {(y_valid.shape[0]+1-count)*100/y_valid.shape[0]+1}")
-    print(count1)
-    np.savetxt(output_valid_BEM, np.concatenate((predictions,y_valid),axis =1).reshape((y_valid.shape[0],2)))
-    outfile = open(efficency_valid_BEM, 'w')
-    outfile.write(str((y_valid.shape[0]+1-count)*100/y_valid.shape[0]+1))
-    outfile.close()
+            count_FN += 1
+    precision = (count_TP)*100/(count_TP+count_FP)
+    recall = (count_TP)*100/(count_TP+count_FN)
+    beta = 0.5
+    f_beta_sq = beta*precision*recall/(precision+recall)
+    items = ['The Accuracy of MEM model for SPam classifier is ',str((count_TP+count_TN)*100/y_valid.shape[0]+1),' The Precision of MEM model for SPam classifier is ',str(precision) ,' The Recall of MEM model for SPam classifier is ',str(recall),' The F_beta_sqaure score for Spam classifier is ',str(f_beta_sq) ]
+    file = open('BEM_items.txt','w')
+    file.writelines(items)
+    file.close()
+
 
 def MEM(train_path, valid_path, test_path, output_valid_MEM, efficency_valid_MEM, output_test_MEM, efficency_test_MEM):
     
@@ -88,20 +94,27 @@ def MEM(train_path, valid_path, test_path, output_valid_MEM, efficency_valid_MEM
     clf = SPAMClassifier2(ArrJ_Y0=np.zeros((Train_data.shape[1],1)),ArrJ_Y1=np.zeros((Train_data.shape[1],1)))
     clf.Parameter_train2(Train_data, y_train)
     predictions = clf.predict2(Valid_data, y_valid)
-    count = 0
-    count1 = 0
+    count_FP = 0
+    count_TP = 0 
+    count_FN = 0
+    count_TN = 0
     for i in range(predictions.shape[0]):
-        if predictions[i] != y_valid[i]:
-            count += 1
-        elif predictions[i] == 1 and y_valid[i] == 1:
-            count1 += 1
-    print(count1)
-    print(
-        f"The Accuracy of BEM model for SPam classifier is {(y_valid.shape[0]+1-count)*100/y_valid.shape[0]+1}")
-    np.savetxt(output_valid_MEM, np.concatenate((predictions,y_valid),axis =1).reshape((y_valid.shape[0],2)))
-    outfile = open(efficency_valid_MEM, 'w')
-    outfile.write(str((y_valid.shape[0]+1-count)*100/y_valid.shape[0]+1))
-    outfile.close()   
+        if y_valid[i] == 1 and predictions[i] == 1 :
+            count_TP += 1
+        elif y_valid[i] == 0 and predictions[i] == 0:
+            count_TN += 1
+        elif predictions[i] == 1 and y_valid[i] == 0:
+            count_FP += 1
+        elif predictions[i] == 0 and y_valid[i] == 1:
+            count_FN += 1
+    precision = (count_TP)*100/(count_TP+count_FP)
+    recall = (count_TP)*100/(count_TP+count_FN)
+    beta = 0.5
+    f_beta_sq = beta*precision*recall/(precision+recall)
+    items = ['The Accuracy of MEM model for SPam classifier is ',str((count_TP+count_TN)*100/y_valid.shape[0]+1),' The Precision of MEM model for SPam classifier is ',str(precision) ,' The Recall of MEM model for SPam classifier is ',str(recall),' The F_beta_sqaure score for Spam classifier is ',str(f_beta_sq) ]
+    file = open('MEM_items.txt','w')
+    file.writelines(items)
+    file.close()
 
 
 def main(train_path, valid_path, test_path, output_valid_BEM, efficency_valid_BEM, output_test_BEM, efficency_test_BEM,output_valid_MEM, efficency_valid_MEM, output_test_MEM, efficency_test_MEM):
